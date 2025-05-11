@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from "../Components/ui/card";
 import { MessageSquare, ThumbsUp, ThumbsDown, ArrowRight, UserCog, Image, Lock, Shield, MessageCircle } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import { Button } from "../Components/ui/button";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useNavigate } from 'react-router-dom';

@@ -13,7 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
-} from "@/components/ui/sidebar"
+} from "@/Components/ui/sidebar"
 import { Link } from "react-router-dom"
 const items = [
   {

@@ -1,6 +1,6 @@
 import { useSelector,useDispatch } from "react-redux";
 import { Navigate } from "react-router-dom";
-import { getYourUser } from "@/features/user/usersSlice";
+import { getYourUser } from "../features/user/usersSlice";
 import { useEffect } from "react";
 const AdminRoute = ({ children }) => {
   const myuser = useSelector((state) => state.user.myuser);

@@ -11,9 +11,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown, Trash2, Reply, ChevronDown, ChevronUp } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { addreport } from "@/features/posts/postsSlice";
+import { Avatar, AvatarFallback, AvatarImage } from "../Components/ui/avatar";
+import { Skeleton } from "../Components/ui/skeleton";
+import { addreport } from "../features/posts/postsSlice";
 
 export default function CommentSection({ postId }) {
   const dispatch = useDispatch();

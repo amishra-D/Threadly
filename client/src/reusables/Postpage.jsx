@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllPosts } from '../features/posts/postsSlice';
 import { toast } from "sonner";
 import PostCard from './Postcard';
-import Boards from '@/reusables/Boards';
-import Createpost from '@/reusables/Createpost';
-import SortCombobox from '@/Components/SortCombobox';
+import Boards from '../reusables/Boards';
+import Createpost from '../reusables/Createpost';
+import SortCombobox from '../Components/SortCombobox';
 import { Plus } from 'lucide-react';
 import Postcardloader from './Postcardloader';
 

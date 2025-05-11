@@ -9,9 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Textarea } from '../Components/ui/textarea';
+import { Input } from '../Components/ui/input';
+import { Button } from '../Components/ui/button';
 import { ImagePlus, Video, Type, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { getYourUser } from '../features/user/usersSlice';

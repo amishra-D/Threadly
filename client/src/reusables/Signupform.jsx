@@ -2,9 +2,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../features/auth/authSlice';
-import { Input } from '@/Components/ui/input';
-import { Button } from '@/Components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Input } from '../Components/ui/input';
+import { Button } from '../Components/ui/button';
+import { Label } from '../Components/ui/label';
 import { toast } from "sonner"
 import { useNavigate } from 'react-router-dom';
 

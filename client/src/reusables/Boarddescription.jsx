@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../Components/ui/card"
 import { useSelector } from 'react-redux';
 
 const BoardDescription = () => {

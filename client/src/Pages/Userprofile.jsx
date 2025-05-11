@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getBookmarks, getUserProfile,getYourUser } from '@/features/user/usersSlice';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { getBookmarks, getUserProfile,getYourUser } from '../features/user/usersSlice';
 import { toast } from 'sonner';
 import PostCard from '../reusables/Postcard';
-import ProfileSkeleton from '@/reusables/ProfileSkeleton';
-import { Button } from '@/Components/ui/button';
+import ProfileSkeleton from '../reusables/ProfileSkeleton';
+import { Button } from '../Components/ui/button';
 import { ChevronLeft, Pen } from 'lucide-react';
 import WithSidebarLayout from '@/reusables/WithSidebarLayout';
 

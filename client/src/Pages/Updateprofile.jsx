@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { ChevronLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateUser } from '@/features/user/usersSlice'
+import { updateUser } from '../features/user/usersSlice'
 
 import { Button } from '../Components/ui/button'
 import { Input } from '../Components/ui/input'

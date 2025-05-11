@@ -4,19 +4,19 @@ import { addlike, adddislike, deletePost, addreport, getAllPosts } from '../feat
 import { addBookmark, removeBookmark } from '../features/user/usersSlice';
 import { handleShare } from '../features/handleShare';
 import { toast } from "sonner";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "../Components/ui/card";
+import { Button } from "../Components/ui/button";
 import { ThumbsUp, ThumbsDown, MessageSquare, Share, Bookmark, ChevronDown, ChevronUp } from "lucide-react";
 import Postcardloader from "./Postcardloader";
 import CommentsSection from "./CommentsSection";
-import { Skeleton } from "@/Components/ui/skeleton";
+import { Skeleton } from "../Components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "../Components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
 
 export default function PostCard({ post, index, featured = false, compact = false }) {

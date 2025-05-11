@@ -4,7 +4,7 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
-} from "@/components/ui/tabs";
+} from "../Components/ui/tabs";
 import {
   Table,
   TableHeader,
@@ -12,7 +12,7 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "@/components/ui/table";
+} from "../Components/ui/table";
 import {
   useReactTable,
   getCoreRowModel,

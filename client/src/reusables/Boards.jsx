@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "../Components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "../Components/ui/select";
 import { useDispatch, useSelector } from 'react-redux';
-import { setActiveBoard, getallboards } from '@/features/boards/boardsSlice';
+import { setActiveBoard, getallboards } from '../features/boards/boardsSlice';
 import { toast } from 'sonner';
 
 const Boards = () => {

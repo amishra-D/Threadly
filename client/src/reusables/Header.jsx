@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Input } from "@/components/ui/input"
+import { Input } from "../Components/ui/input"
 import { Search } from 'lucide-react'
-import { Button } from "@/components/ui/button"
+import { Button } from "../Components/ui/button"
 import Logo from '../assets/Logo.jpg';
 import { useDispatch, useSelector } from 'react-redux';
 import { getYourUser, searchUser } from '../features/user/usersSlice';

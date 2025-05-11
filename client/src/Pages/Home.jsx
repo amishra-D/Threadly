@@ -1,7 +1,7 @@
 import React from 'react';
 import Mysideb from '../reusables/Mysideb';
 import Postpage from '../reusables/Postpage';
-import Header from '@/reusables/Header';
+import Header from '../reusables/Header';
 import Boarddescription from '@/reusables/Boarddescription';
 
 const Home = () => {

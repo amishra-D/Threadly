@@ -1,5 +1,5 @@
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardFooter, CardHeader } from "../Components/ui/card";
+import { Skeleton } from "../Components/ui/skeleton";
 
 export default function Postcardloader({ compact = false }) {
   return (

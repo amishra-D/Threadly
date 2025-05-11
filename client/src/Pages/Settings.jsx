@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUser,deleteuser } from '@/features/user/usersSlice';
+import { updateUser,deleteuser } from '../features/user/usersSlice';
 import { resetpassword } from '@/features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../Components/ui/card";
 import { User, Lock, Trash2, ChevronLeft } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import { Input } from "../Components/ui/input";
+import { Label } from "../Components/ui/label";
+import { Button } from "../Components/ui/button";
+import { Separator } from "../Components/ui/separator";
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogClose } from "../Components/ui/dialog";
 
 function SettingsPage() {
   const navigate = useNavigate();

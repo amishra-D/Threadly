@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
   process.env.FRONT_URL,
-  'http://localhost:5173'
+"https://threadly-fro.onrender.com"
 ];
 app.use(cors({
   origin: function (origin, callback) {

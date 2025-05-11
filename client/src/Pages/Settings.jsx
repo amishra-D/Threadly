@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser,deleteuser } from '../features/user/usersSlice';
-import { resetpassword } from '@/features/auth/authSlice';
+import { resetpassword } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../Components/ui/card";
 import { User, Lock, Trash2, ChevronLeft } from "lucide-react";

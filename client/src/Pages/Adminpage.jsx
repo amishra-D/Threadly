@@ -24,8 +24,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { getallusers, deleteuser } from "../features/user/usersSlice";
 import { getAllPosts, getAllReports, deletePost, deleteReport } from "../features/posts/postsSlice";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "../Components/ui/input";
+import { Button } from "../Components/ui/button";
 import {
   ChevronLeft,
   ChevronRight,
@@ -35,8 +35,8 @@ import {
   ArrowUpDown,
   Trash2,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "../Components/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "../Components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,7 +46,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "../Components/ui/alert-dialog";
 import { toast } from "sonner";
 import WithSidebarLayout from "@/reusables/WithSidebarLayout";
 import { useNavigate } from "react-router-dom";

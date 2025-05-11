@@ -8,7 +8,6 @@ import PostCard from '../reusables/Postcard';
 import ProfileSkeleton from '../reusables/ProfileSkeleton';
 import { Button } from '../Components/ui/button';
 import { ChevronLeft, Pen } from 'lucide-react';
-import WithSidebarLayout from '@/reusables/WithSidebarLayout';
 
 const Userprofile = () => {
   const navigate=useNavigate()

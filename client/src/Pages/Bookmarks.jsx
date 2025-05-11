@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import PostCard from '../reusables/Postcard';
 import { useDispatch, useSelector } from 'react-redux';
-import { getBookmarks } from '@/features/user/usersSlice';
-import Header from '@/reusables/Header';
-import Mysideb from '@/reusables/Mysideb';
+import { getBookmarks } from '../features/user/usersSlice';
+import Header from '../reusables/Header';
+import Mysideb from '../reusables/Mysideb';
 import WithSidebarLayout from '@/reusables/WithSidebarLayout';
 
 const Bookmarks = () => {

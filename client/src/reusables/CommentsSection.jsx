@@ -8,9 +8,9 @@ import {
   adddislike,
 } from "../features/comments/commentsSlice";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "../Components/ui/button";
 import { ThumbsUp, ThumbsDown, Trash2, Reply, ChevronDown, ChevronUp } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "../Components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "../Components/ui/avatar";
 import { Skeleton } from "../Components/ui/skeleton";
 import { addreport } from "../features/posts/postsSlice";

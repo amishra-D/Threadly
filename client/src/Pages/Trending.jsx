@@ -4,7 +4,6 @@ import { getAllPosts } from '../features/posts/postsSlice';
 import PostCard from '../reusables/Postcard'; // adjust path as needed
 import { toast } from 'sonner';
 import { Skeleton } from '../Components/ui/skeleton';
-import WithSidebarLayout from '@/reusables/WithSidebarLayout';
 import Mysideb from '../reusables/Mysideb';
 import Header from '../reusables/Header';
 

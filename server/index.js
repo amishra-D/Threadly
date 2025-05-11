@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
   process.env.FRONT_URL,
-"https://threadly-fro.onrender.com"
+"https://threadly-3859.vercel.app"
 ];
 app.use(cors({
   origin: function (origin, callback) {

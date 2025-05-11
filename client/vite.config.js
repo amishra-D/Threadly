@@ -8,7 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
        screens: path.resolve(__dirname, './src/screens'),
-      components: 'src/components',
+      components: 'src/Components',
       "@": path.resolve(__dirname, "./src"),
     },
   },

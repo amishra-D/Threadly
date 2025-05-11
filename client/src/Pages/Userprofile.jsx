@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../Components/ui/tabs";
 import { getBookmarks, getUserProfile,getYourUser } from '../features/user/usersSlice';
 import { toast } from 'sonner';
 import PostCard from '../reusables/Postcard';

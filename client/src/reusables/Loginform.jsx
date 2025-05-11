@@ -6,8 +6,10 @@ import { Input } from '@/Components/ui/input';
 import { Button } from '@/Components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from "sonner"
+import { useNavigate } from 'react-router-dom';
 
 const Loginform = () => {
+  const navigate=useNavigate()
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
 
@@ -21,6 +23,7 @@ const Loginform = () => {
     try {
       const result = await dispatch(loginUser(data)).unwrap();
       toast.success(result.message || "Login successfull!");
+      navigate('/home');
     } catch (err) {
       toast.error(err.message || "Login failed. Please try again.");
     }

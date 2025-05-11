@@ -7,6 +7,8 @@ export default defineConfig({
   base: '/',
   resolve: {
     alias: {
+       screens: path.resolve(__dirname, './src/screens'),
+      components: 'src/components',
       "@": path.resolve(__dirname, "./src"),
     },
   },

@@ -5,11 +5,11 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateUser } from '@/features/user/usersSlice'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Card, CardHeader, CardContent } from '@/components/ui/card'
+import { Button } from '../Components/ui/button'
+import { Input } from '../Components/ui/input'
+import { Textarea } from '../Components/ui/textarea'
+import { Label } from '../Components/ui/label'
+import { Card, CardHeader, CardContent } from '../Components/ui/card'
 import { toast } from 'sonner'
 
 const banners = [

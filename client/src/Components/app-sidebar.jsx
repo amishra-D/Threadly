@@ -1,7 +1,7 @@
 import {House,Settings,TrendingUp,User,Bookmark,FileUser } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "./Components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar"
 import { useSelector,useDispatch } from "react-redux";
-import { getYourUser } from "../features/user/usersSlice";
+import { getYourUser } from "@/features/user/usersSlice";
 import { useEffect } from "react";
 import {
   Sidebar,

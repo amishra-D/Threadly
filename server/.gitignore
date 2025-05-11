@@ -1,0 +1,26 @@
+# Node.js specific
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# dotenv files
+.env
+
+# Logs
+logs
+*.log
+*.log.*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# IDE files (if using VS Code, for example)
+.vscode/
+
+# Build directories
+build/
+dist/
+
+# Dependency directories for Docker setups
+docker/

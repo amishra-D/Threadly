@@ -210,14 +210,14 @@ console.log(myuser)
             className='flex flex-col sm:flex-row gap-4'
             variants={slideUp}
           >
-            <motion.div whileHover={{ scale: 1.05 }} whiletap={{ scale: 0.95 }}>
+            <motion.div whilehover={{ scale: 1.05 }} whiletap={{ scale: 0.95 }}>
               <Button className='bg-[#ddff00] text-black hover:bg-[#c2e600] px-6 sm:px-8 py-6 text-lg' onClick={()=>{
                 myuser?navigate('/home'):navigate('/login')
               }}>
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whiletap={{ scale: 0.95 }}>
+            <motion.div whilehover={{ scale: 1.05 }} whiletap={{ scale: 0.95 }}>
               <Button variant="outline" className='text-white border-white hover:bg-gray-800 px-6 sm:px-8 py-6 text-lg'>
                 Learn More
               </Button>
@@ -227,7 +227,7 @@ console.log(myuser)
 
         <motion.div 
           variants={fadeIn}
-          whileHover={{ scale: 1.02 }}
+          whilehover={{ scale: 1.02 }}
           transition={{ type: "spring", stiffness: 300 }}
         >
           <Card className='w-full sm:w-[500px] flex flex-col bg-[#1d1c1c] border-gray-800 shadow-lg shadow-[#ddff00]/10 z-10'>
@@ -251,7 +251,7 @@ console.log(myuser)
               <div className='flex gap-3 items-center'>
                 <motion.div 
                   className='w-8 h-8 rounded-full overflow-hidden'
-                  whileHover={{ scale: 1.1 }}
+                  whilehover={{ scale: 1.1 }}
                 >
                   <img 
                     className='object-cover w-full h-full'
@@ -270,7 +270,7 @@ console.log(myuser)
               </p>
               <div className='flex gap-4 mt-4 w-full justify-start'>
                 <motion.div 
-                  whileHover={{ scale: 1.1 }}
+                  whilehover={{ scale: 1.1 }}
                   whiletap={{ scale: 0.9 }}
                 >
                   <Button variant="ghost" size="sm" className='flex gap-1 items-center text-gray-400 hover:text-[#ddff00]'>
@@ -279,7 +279,7 @@ console.log(myuser)
                   </Button>
                 </motion.div>
                 <motion.div 
-                  whileHover={{ scale: 1.1 }}
+                  whilehover={{ scale: 1.1 }}
                   whiletap={{ scale: 0.9 }}
                 >
                   <Button variant="ghost" size="sm" className='flex gap-1 items-center text-gray-400 hover:text-[#ddff00]'>
@@ -288,7 +288,7 @@ console.log(myuser)
                   </Button>
                 </motion.div>
                 <motion.div 
-                  whileHover={{ scale: 1.1 }}
+                  whilehover={{ scale: 1.1 }}
                   whiletap={{ scale: 0.9 }}
                 >
                   <Button variant="ghost" size="sm" className='flex gap-1 items-center text-gray-400 hover:text-[#ddff00]'>
@@ -343,7 +343,7 @@ console.log(myuser)
       >
         <div className='max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4'>
           <motion.h2 
-            whileHover={{ scale: 1.05 }}
+            whilehover={{ scale: 1.05 }}
             className='text-[#ddff00] text-lg font-bold cursor-pointer'
           >
             Threadly

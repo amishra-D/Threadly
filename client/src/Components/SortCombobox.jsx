@@ -6,13 +6,13 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
-} from "@/components/ui/command";
+} from "@/Components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+} from "@/Components/ui/popover";
+import { Button } from "@/Components/ui/button";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 

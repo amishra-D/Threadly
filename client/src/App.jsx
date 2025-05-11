@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import Authentication from './Pages/Authentication';
 import { BrowserRouter, Route, Routes } from "react-router"
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "./Components/theme-provider"
 import { Toaster } from 'sonner';
 import Updateprofile from './Pages/Updateprofile';
 import  Home  from './Pages/Home';

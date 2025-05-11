@@ -310,7 +310,6 @@ const AdminDashboard = () => {
     accessorKey: "reportedBy.username",
     header: "Reported By",
     cell: ({ row }) => {
-      // Check if reportedBy is a string (just the username) or an object
       const reportedBy = row.original.reportedBy;
       const username = typeof reportedBy === 'string' 
         ? reportedBy 

@@ -50,14 +50,14 @@ const FeatureCard = ({ icon: Icon, title, description }) => {
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={itemVariants}
-      whileHover={{ y: -5 }}
+      whilehover={{ y: -5 }}
       className="h-full"
     >
       <Card className='bg-[#1d1c1c] border-gray-800 hover:border-[#ddff00]/30 transition-all h-full'>
         <CardHeader className='flex flex-row items-center gap-4'>
           <motion.div 
             className='p-3 rounded-full bg-[#ddff00]/10'
-            whileHover={{ rotate: 10, scale: 1.1 }}
+            whilehover={{ rotate: 10, scale: 1.1 }}
           >
             <Icon className='text-[#ddff00]' />
           </motion.div>
@@ -70,7 +70,7 @@ const FeatureCard = ({ icon: Icon, title, description }) => {
           <Button 
             variant="outline" 
             className='text-white border-gray-600 hover:bg-[#ddff00]/10 hover:border-[#ddff00]/30'
-            whileHover={{ scale: 1.05 }}
+            whilehover={{ scale: 1.05 }}
             whiletap={{ scale: 0.95 }}
           >
             Learn more
@@ -149,19 +149,19 @@ console.log(myuser)
         className='w-full px-4 sm:px-8 py-4 flex justify-between items-center fixed top-0 z-50 bg-black/50 backdrop-blur-sm border-b border-gray-800'
       >
         <motion.h1 
-          whileHover={{ scale: 1.05 }}
+          whilehover={{ scale: 1.05 }}
           className='text-[#ddff00] text-lg sm:text-2xl font-bold cursor-pointer'
         >
           Threadly
         </motion.h1>
         <div className='flex gap-2 sm:gap-4'>
           {!myuser &&  (
-  <motion.div whileHover={{ scale: 1.05 }} whiletap={{ scale: 0.95 }}>
+  <motion.div whilehover={{ scale: 1.05 }} whiletap={{ scale: 0.95 }}>
     <Button variant="ghost" className='text-white hover:bg-gray-800' onClick={() => navigate('/auth')}>Login</Button>
   </motion.div>
 )}
 {!myuser && (
-  <motion.div whileHover={{ scale: 1.05 }} whiletap={{ scale: 0.95 }}>
+  <motion.div whilehover={{ scale: 1.05 }} whiletap={{ scale: 0.95 }}>
     <Button className='bg-[#ddff00] text-black hover:bg-[#c2e600]' onClick={() => navigate('/auth')}>Sign Up</Button>
   </motion.div>
 )}

@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
   process.env.FRONT_URL,
-  'https://threadly-3859.vercel.app',
+  // 'https://threadly-3859.vercel.app',
   'http://localhost:5173'
 ];
 

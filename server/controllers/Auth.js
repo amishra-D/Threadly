@@ -3,53 +3,122 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 dotenv.config();
-
+const otpGenerator = require('otp-generator');
+const nodemailer = require('nodemailer');
 const signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists. Please login.' });
+      if (!existingUser.isVerified) {
+        const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
+        const otpExpiry = Date.now() + 5 * 60 * 1000;
+
+        existingUser.otp = otp;
+        existingUser.otpExpiry = otpExpiry;
+        
+        await existingUser.save();
+
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
+
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: 'OTP Verification',
+          text: `Your OTP is: ${otp}`,
+        });
+
+        return res.status(200).json({ message: 'OTP resent. Please check your email.' });
+      }
+
+      return res.status(400).json({ message: 'User already verified. Please login.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
+    const otpExpiry = Date.now() + 5 * 60 * 1000;
 
     const newUser = new User({
       username,
       email,
       passwordHash: hashedPassword,
-      isAdmin:false 
+      isVerified: false,
+      otp,
+      otpExpiry,
     });
 
     await newUser.save();
 
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-    res.status(201).json({ user: { id: newUser._id, username: newUser.username, email: newUser.email }, token });
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'OTP Verification',
+      text: `Your OTP is: ${otp}`,
+    });
+
+    res.status(201).json({ message: 'Signup successful. Please verify OTP sent to your email.' });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Something went wrong.' });
   }
 };
 
-const login = async (req, res) => {
-      console.log("in api2",req.body)
+const verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
 
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (user.isVerified) return res.status(400).json({ message: 'Already verified' });
+
+    if (user.otp !== otp || user.otpExpiry < Date.now()) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    user.isVerified = true;
+    user.otp = null;
+    user.otpExpiry = null;
+    await user.save();
+
+    res.status(200).json({ message: 'OTP verified successfully. You can now log in.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Something went wrong.' });
+  }
+};
+
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'User not found. Please signup.' });
     }
-
+if (!user.isVerified) {
+      return res.status(401).json({ message: 'Please verify your account via OTP.' });
+    }
     const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordCorrect) {
       return res.status(400).json({ message: 'Invalid credentials.' });
     }
-
     const token = jwt.sign({ id: user._id,isAdmin: user.isAdmin}, process.env.JWT_SECRET, { expiresIn: '7d' });
-
   res.cookie('token', token, {
   httpOnly: true,
   secure: true,
@@ -109,4 +178,4 @@ const logout=async(req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
-module.exports = { signup, login,resetpassword,logout };
+module.exports = { signup, login,resetpassword,verifyOtp,logout };

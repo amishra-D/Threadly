@@ -23,7 +23,8 @@ export const getcommentAPI=async(postId)=>{
     return res.data;
 }
 export const deletecommentAPI=async(commentId)=>{
-    const res=await axios.delete(`${BASE_URL}/comments/deletecomment/${commentId}`,null,{
+    console.log(commentId)
+    const res=await axios.delete(`${BASE_URL}/comments/deletecomment/${commentId}`,{
         withCredentials: true
     });
     return res.data;

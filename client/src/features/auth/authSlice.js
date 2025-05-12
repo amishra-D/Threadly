@@ -30,6 +30,19 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
+export const verifyotp = createAsyncThunk(
+  'auth/verifyotp',
+  async ({otp,email}, thunkAPI) => {
+    try {
+      const res = await axios.put(`${BASE_URL}/auth/verifyotp`,{otp,email}, {
+        withCredentials: true
+      });
+      return res.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response.data.message);
+    }
+  }
+);
 export const resetpassword = createAsyncThunk(
   'auth/resetpassword',
   async (formData, thunkAPI) => {
@@ -121,8 +134,22 @@ const authSlice = createSlice({
       .addCase(resetpassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })  }
-});
+      })
+    .addCase(verifyotp.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyotp.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.isAuthenticated = true;
+      })
+      .addCase(verifyotp.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+  }
+})
 
 
 export const { logout } = authSlice.actions;

@@ -14,16 +14,20 @@ import { Textarea } from "../Components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "../Components/ui/avatar";
 import { Skeleton } from "../Components/ui/skeleton";
 import { addreport } from "../features/posts/postsSlice";
+import { getYourUser } from "@/features/user/usersSlice";
 
 export default function CommentSection({ postId }) {
   const dispatch = useDispatch();
   const { items: comments, loading } = useSelector(state => state.comments);
-  const currentUser = useSelector(state => state.user.user);
+  const currentUser = useSelector(state => state.user.myuser);
   const [content, setContent] = useState("");
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyContent, setReplyContent] = useState("");
   const [expandedReplies, setExpandedReplies] = useState({});
-
+ 
+  useEffect(() => {
+      dispatch(getYourUser());
+    }, [dispatch]);
   useEffect(() => {
     if (postId) {
       dispatch(getcomment(postId));
@@ -72,6 +76,7 @@ catch (err) {
 
   const handleDelete = async (commentId) => {
     try {
+      console.log("This is commentid",commentId)
       await dispatch(deletecomment(commentId)).unwrap();
       toast.success("Comment deleted");
       dispatch(getcomment(postId));
@@ -180,18 +185,6 @@ catch (err) {
   >
     <span className="text-xs">Report</span>
   </Button>
-
-  {currentUser?._id === comment.userId?._id && (
-    <Button
-      size="icon"
-      variant="ghost"
-      onClick={() => handleDelete(comment._id)}
-      className="text-gray-400 hover:text-red-500 h-8 w-8"
-      aria-label="Delete"
-    >
-      <Trash2 className="h-4 w-4" />
-    </Button>
-  )}
 </div>
 
               

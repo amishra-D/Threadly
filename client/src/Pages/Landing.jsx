@@ -39,6 +39,7 @@ const slideUp = {
   visible: { y: 0, opacity: 1, transition: { duration: 0.6 } }
 };
 const FeatureCard = ({ icon: Icon, title, description }) => {
+    const navigate = useNavigate();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1
@@ -53,7 +54,7 @@ const FeatureCard = ({ icon: Icon, title, description }) => {
       whilehover={{ y: -5 }}
       className="h-full"
     >
-      <Card className='bg-[#1d1c1c] border-gray-800 hover:border-[#ddff00]/30 transition-all h-full'>
+      <Card className='bg-[#1d1c1c] border-gray-800 hover:border-[#ddff00]/30 transition-all h-full z-30'>
         <CardHeader className='flex flex-row items-center gap-4'>
           <motion.div 
             className='p-3 rounded-full bg-[#ddff00]/10'
@@ -69,9 +70,12 @@ const FeatureCard = ({ icon: Icon, title, description }) => {
         <CardFooter>
           <Button 
             variant="outline" 
-            className='text-white border-gray-600 hover:bg-[#ddff00]/10 hover:border-[#ddff00]/30'
+            className='text-white border-gray-600 hover:bg-[#ddff00]/10 hover:border-[#ddff00]/30 z-50'
             whilehover={{ scale: 1.05 }}
             whiletap={{ scale: 0.95 }}
+            onClick={(e)=>{              e.stopPropagation();
+              e.stopPropagation();
+              navigate('/about')}}
           >
             Learn more
           </Button>
@@ -212,13 +216,14 @@ console.log(myuser)
           >
             <motion.div whilehover={{ scale: 1.05 }} whiletap={{ scale: 0.95 }}>
               <Button className='bg-[#ddff00] text-black hover:bg-[#c2e600] px-6 sm:px-8 py-6 text-lg' onClick={()=>{
-                myuser?navigate('/home'):navigate('/login')
+                myuser?navigate('/home'):navigate('/auth')
               }}>
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </motion.div>
             <motion.div whilehover={{ scale: 1.05 }} whiletap={{ scale: 0.95 }}>
-              <Button variant="outline" className='text-white border-white hover:bg-gray-800 px-6 sm:px-8 py-6 text-lg'>
+              <Button variant="outline" className='text-white border-white hover:bg-gray-800 px-6 sm:px-8 py-6 text-lg'             onClick={()=>navigate('/about')}
+>
                 Learn More
               </Button>
             </motion.div>

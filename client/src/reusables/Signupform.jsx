@@ -24,8 +24,7 @@ const Signupform = () => {
     try {
       const result = await dispatch(registerUser(data)).unwrap();
       toast.success(result.message || "Signed up successfully!");
-      
-      navigate('/updateprofile',{state:data.username})
+navigate('/otp', { state: { email: data.email } });
     } catch (err) {
       toast.error(err.message || "Signup failed. Please try again.");
     }

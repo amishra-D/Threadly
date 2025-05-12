@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser,deleteuser } from '../features/user/usersSlice';
-import { resetpassword } from '../features/auth/authSlice';
+import { logoutUser, resetpassword } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../Components/ui/card";
 import { User, Lock, Trash2, ChevronLeft } from "lucide-react";
@@ -30,7 +30,6 @@ function SettingsPage() {
 
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
 
-  // Populate form with current user data
   useEffect(() => {
     if (user) {
       setFormData({
@@ -73,6 +72,16 @@ const deleteaccount=async()=>{
     console.error(error);
     }
 }
+const logout=async()=>{
+  try{
+    await dispatch(logoutUser()).unwrap();
+    navigate('/auth');
+    toast.success('Logged out successfully');
+  }
+  catch(error){
+    console.error(error);
+}
+}
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -102,7 +111,6 @@ const deleteaccount=async()=>{
 
       <div className="max-w-3xl mt-10 mx-auto px-4 py-8 space-y-6">
         
-        {/* Profile Update Section */}
         <form onSubmit={handleProfileSubmit}>
           <Card>
             <CardHeader className="flex flex-row items-center space-x-4 space-y-0">
@@ -140,7 +148,6 @@ const deleteaccount=async()=>{
           </Card>
         </form>
 
-        {/* Change Password Section */}
         <Card>
           <CardHeader className="flex flex-row items-center space-x-4 space-y-0">
             <Lock className="w-5 h-5" />
@@ -215,6 +222,9 @@ const deleteaccount=async()=>{
               <Trash2 className="w-4 h-4 mr-2" />
               Delete Account
             </Button>
+             <Button variant="destructive" className="w-full" onClick={logout}>
+              <Trash2 className="w-4 h-4 mr-2" />
+Log out</Button>
           </CardContent>
         </Card>
       </div>

@@ -13,6 +13,8 @@ import AdminDashboard from './Pages/Adminpage';
 import  SettingsPage from './Pages/Settings';
 import Unauthorized from "./Pages/Unauthorized";
 import AdminRoute from "./reusables/AdminRoute";
+import About from './Pages/About';
+import Otp from './Pages/Otp';
 
 
 const App = () => {
@@ -28,6 +30,7 @@ const App = () => {
       <Route path="/auth" element={<Authentication />} />
       <Route path="/trending" element={<Trending />} />
       <Route path="/bookmark" element={<Bookmarks />} />
+      <Route path="/otp" element={<Otp />} />
       <Route path="/" element={<Landing />} />
 <Route
   path="/admin"
@@ -40,7 +43,7 @@ const App = () => {
    <Route path="/settings" element={<SettingsPage />} />
 
       <Route path="*" element={<Landing />} />
-
+<Route path="/about" element={<About/>}></Route>
       </Routes>
       </div>
   </ThemeProvider>

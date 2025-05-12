@@ -11,7 +11,11 @@ const BoardDescription = () => {
         <div className='relative'>
           <img 
             className='w-full h-28 lg:h-32 object-cover rounded-t-lg'
-            src={activeBoard?.img} 
+src={
+  activeBoard?.name === 'All'
+    ? 'https://images.unsplash.com/photo-1580196969807-cc6de06c05be?q=80&w=1958&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+    : activeBoard?.img
+}
             alt='banner'
           />
           <div className='absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent' />

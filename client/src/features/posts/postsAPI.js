@@ -48,7 +48,8 @@ export const deletePostAPI = async (postId) => {
   return res.data;
 };
 export const addlikeAPI=async(postId)=> {
-  const res = await axios.post(`${BASE_URL}like-dislike/likepost/${postId}`,null,{
+  console.log("api called")
+  const res = await axios.post(`${BASE_URL}/like-dislike/likepost/${postId}`,null,{
     params: { postId},
     withCredentials: true
   });

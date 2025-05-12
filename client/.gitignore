@@ -12,6 +12,17 @@ dist
 dist-ssr
 *.local
 node_modules
+# Ignore client-side stuff
+/client/node_modules/
+/client/.env
+
+# Ignore server-side stuff
+/server/node_modules/
+/server/.env
+
+# Ignore log files, temp, OS files
+*.log
+.DS_Store
 .env
 
 .vscode/*

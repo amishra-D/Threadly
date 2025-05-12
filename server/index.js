@@ -38,20 +38,24 @@ app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
   process.env.FRONT_URL,
-"https://threadly-3859.vercel.app"
+  'https://threadly-3859.vercel.app',
+  'http://localhost:5173'
 ];
+
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log("CORS blocked:", origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
 }));
+
   app.use("/api/v1/auth", authroutes);
   app.use("/api/v1/posts",authMiddleware, postroutes);
   app.use("/api/v1/boards",authMiddleware, boardroutes);

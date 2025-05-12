@@ -34,7 +34,7 @@ export const resetpassword = createAsyncThunk(
   'auth/resetpassword',
   async (formData, thunkAPI) => {
     try {
-      const res = await axios.post(`${BASE_URL}/auth/signup`, formData, {
+      const res = await axios.post(`${BASE_URL}/auth/resetpassword`, formData, {
         withCredentials: true
       });
       return res.data;

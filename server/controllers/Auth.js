@@ -50,18 +50,20 @@ const login = async (req, res) => {
 
     const token = jwt.sign({ id: user._id,isAdmin: user.isAdmin}, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    res
-      .cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
-      .status(200)
-      .json({
-        user, 
-        message: 'Logged in successfully'
-      });
+  res.cookie('token', token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'None',
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+})
+  .status(200)
+  .json({
+    user,
+    message: 'Logged in successfully',
+  });
+
+console.log("Sent token cookie to frontend");
+
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Something went wrong.' });

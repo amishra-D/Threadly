@@ -47,6 +47,7 @@ function Otp() {
         type="text"
         maxLength={6}
         value={otp}
+          pattern="[A-Za-z0-9]*"
         onChange={(val) => setOtp(val)}
         aria-label="OTP Input"
         className="w-full"

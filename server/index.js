@@ -38,8 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
   process.env.FRONT_URL,
-   'https://threadly-7satsjhw4-amishra-ds-projects.vercel.app',
-  // 'http://localhost:5173'
+   'https://threadly-3859.vercel.app',
 ];
 
 app.use(cors({

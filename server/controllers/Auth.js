@@ -66,11 +66,72 @@ const signup = async (req, res) => {
     });
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'OTP Verification',
-      text: `Your OTP is: ${otp}`,
-    });
+  from: process.env.EMAIL_USER,
+  to: email,
+  subject: 'OTP Verification',
+  html: `
+    <html lang="en">
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            padding: 20px;
+            margin: 0;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+          }
+          .logo {
+            width: 100px;
+            margin-bottom: 20px;
+          }
+          .otp {
+            background-color: #ddff00;
+            color: #000000;
+            font-size: 32px;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 20px;
+          }
+          .footer {
+            font-size: 14px;
+            color: #cccccc;
+            margin-top: 30px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <img src="cid:logo" alt="Logo" class="logo" />
+          <h2>OTP Verification</h2>
+          <h3>Threadly</h3>
+          <p style="font-size: 16px;">Your One-Time Password (OTP) for verification is below:</p>
+          <div class="otp">${otp}</div>
+          <p class="footer">
+            If you did not request this OTP, please ignore this email.<br />
+            For any issues, contact support.
+          </p>
+        </div>
+      </body>
+    </html>
+  `,
+  attachments: [
+    {
+      filename: 'Logo.jpg',
+      path: '../Logo.jpg',
+      cid: 'logo',
+    },
+  ],
+});
 
     res.status(201).json({ message: 'Signup successful. Please verify OTP sent to your email.' });
 

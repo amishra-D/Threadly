@@ -24,7 +24,6 @@ export const createTextPostAPI = async ({ boardId, data }) => {
 export const uploadImagePostAPI = async ({ boardId, formData }) => {
   const res = await axios.post(`${BASE_URL}/posts/createpostimage/${boardId}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
-    params: { boardId},
     withCredentials: true
 
   });

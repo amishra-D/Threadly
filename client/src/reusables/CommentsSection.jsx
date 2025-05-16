@@ -13,7 +13,7 @@ import { ThumbsUp, ThumbsDown, Trash2, Reply, ChevronDown, ChevronUp } from "luc
 import { Textarea } from "../Components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "../Components/ui/avatar";
 import { Skeleton } from "../Components/ui/skeleton";
-import { addreport } from "../features/posts/postsSlice";
+import { addreport, getAllPosts } from "../features/posts/postsSlice";
 import { getYourUser } from "@/features/user/usersSlice";
 
 export default function CommentSection({ postId }) {
@@ -80,6 +80,7 @@ catch (err) {
       await dispatch(deletecomment(commentId)).unwrap();
       toast.success("Comment deleted");
       dispatch(getcomment(postId));
+      dispatch(getAllPosts());
       
     } catch (err) {
       toast.error(err.message || "Failed to delete comment");

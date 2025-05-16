@@ -142,15 +142,16 @@ const deletecomment = async (req, res) => {
                 message: 'Comment not found'
             });
         }
-
         const postId = comment.postId;
+        const replies = await Comments.find({ parentCommentId: commentId });
+
+        const totalCommentsToDelete = 1 + replies.length;
 
         await Comments.deleteMany({ parentCommentId: commentId });
-
         await Comments.findByIdAndDelete(commentId);
 
         await Posts.findByIdAndUpdate(postId, {
-            $inc: { commentsCount: -1 }
+            $inc: { commentsCount: -totalCommentsToDelete }
         });
 
         return res.status(200).json({
@@ -165,6 +166,7 @@ const deletecomment = async (req, res) => {
         });
     }
 };
+
 
 const getcomments = async (req, res) => {
     try {

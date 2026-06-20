@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -21,6 +22,17 @@ const allowedOrigins = [
   "http://localhost:5173",
 ];
 
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 100, 
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many requests created from this IP, please try again after 15 minutes'
+  }
+});
+
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -34,6 +46,9 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+// Apply the rate limiting middleware to all requests
+app.use(apiLimiter);
 
 app.use('/api/v1/auth', createProxyMiddleware({ target: services.auth, changeOrigin: true }));
 

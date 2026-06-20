@@ -44,6 +44,8 @@ const connectRabbitMQ = async () => {
         }
     });
 
+    await channel.assertQueue('post_comments_count', { durable: true });
+
     console.log("RabbitMQ Connected in Interaction Service");
   } catch (err) {
     console.error("Failed to connect to RabbitMQ in Interaction Service, retrying...", err.message);
@@ -74,11 +76,14 @@ const addcomment = async (req, res) => {
 
         await comment.save();
 
-        // Increment comments count in Content Service
+        // Increment comments count in Content Service via RabbitMQ
         try {
-            await axios.post(`${CONTENT_SERVICE_URL}/internal/posts/${postId}/comments-count`, { increment: 1 });
+            channel.sendToQueue('post_comments_count', Buffer.from(JSON.stringify({
+                postId,
+                increment: 1
+            })));
         } catch(err) {
-            console.error("Failed to increment comment count in Content Service", err.message);
+            console.error("Failed to enqueue comment count increment", err.message);
         }
 
         return res.status(200).json({
@@ -194,11 +199,14 @@ const deletecomment = async (req, res) => {
         await Comments.deleteMany({ parentCommentId: commentId });
         await Comments.findByIdAndDelete(commentId);
 
-        // Decrement comments count in Content Service
+        // Decrement comments count in Content Service via RabbitMQ
         try {
-            await axios.post(`${CONTENT_SERVICE_URL}/internal/posts/${postId}/comments-count`, { increment: -totalCommentsToDelete });
+            channel.sendToQueue('post_comments_count', Buffer.from(JSON.stringify({
+                postId,
+                increment: -totalCommentsToDelete
+            })));
         } catch(err) {
-            console.error("Failed to decrement comment count in Content Service");
+            console.error("Failed to enqueue comment count decrement", err.message);
         }
 
         return res.status(200).json({

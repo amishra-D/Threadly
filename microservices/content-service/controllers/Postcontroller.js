@@ -27,6 +27,34 @@ const connectRabbitMQ = async () => {
         }
     });
 
+    await channel.assertQueue('post_comments_count', { durable: true });
+    channel.consume('post_comments_count', async (msg) => {
+        if(msg !== null) {
+            const { postId, increment } = JSON.parse(msg.content.toString());
+            try {
+                await Posts.findByIdAndUpdate(postId, { $inc: { commentsCount: increment } });
+                console.log(`[RabbitMQ] Updated commentsCount by ${increment} for post ${postId}`);
+            } catch(err) {
+                console.error("Error updating commentsCount", err);
+            }
+            channel.ack(msg);
+        }
+    });
+
+    await channel.assertQueue('post_reports_count', { durable: true });
+    channel.consume('post_reports_count', async (msg) => {
+        if(msg !== null) {
+            const { postId, increment } = JSON.parse(msg.content.toString());
+            try {
+                await Posts.findByIdAndUpdate(postId, { $inc: { reportsCount: increment } });
+                console.log(`[RabbitMQ] Updated reportsCount by ${increment} for post ${postId}`);
+            } catch(err) {
+                console.error("Error updating reportsCount", err);
+            }
+            channel.ack(msg);
+        }
+    });
+
     console.log("RabbitMQ Connected in Content Service");
   } catch (err) {
     console.error("Failed to connect to RabbitMQ in Content Service, retrying...", err.message);

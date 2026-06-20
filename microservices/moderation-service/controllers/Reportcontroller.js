@@ -44,6 +44,8 @@ const connectRabbitMQ = async () => {
         }
     });
 
+    await channel.assertQueue('post_reports_count', { durable: true });
+
     console.log("RabbitMQ Connected in Moderation Service");
   } catch (err) {
     console.error("Failed to connect to RabbitMQ in Moderation Service, retrying...", err.message);
@@ -67,10 +69,13 @@ const addreport = async (req, res) => {
 
     try {
         if(type === 'Post') {
-            await axios.post(`${CONTENT_SERVICE_URL}/internal/posts/${contentId}/reports-count`, { increment: 1 });
+            channel.sendToQueue('post_reports_count', Buffer.from(JSON.stringify({
+                postId: contentId,
+                increment: 1
+            })));
         }
     } catch(err) {
-        console.error("Failed to increment reports count", err.message);
+        console.error("Failed to enqueue reports count update", err.message);
     }
 
     return res.status(201).json({

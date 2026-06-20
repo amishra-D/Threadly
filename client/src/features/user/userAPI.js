@@ -1,23 +1,22 @@
-import axios from 'axios';
-
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-
+import { axiosinstance } from "@/utils/axios";
 export const getyouruserAPI = async () => {
-  const res = await axios.get(`${BASE_URL}/profile/getyourprofile`, {
+  const res = await axiosinstance.get(`/profile/getyourprofile`, {
     withCredentials: true,
   });
   return res.data;
 };
 export const updateuserAPI = async (data) => {
-  const res = await axios.put(`${BASE_URL}/profile/updateprofile`, data, {
+  const res = await axiosinstance.put(`/profile/updateprofile`, data, {
     withCredentials: true,
     
   });
   return res.data;
 };
 
-export const getuserprofileAPI = async ( username ) => {
-  const res = await axios.get(`${BASE_URL}/profile/getuserprofile/${username}`, {
+export const getuserprofileAPI = async ( data ) => {
+  console.log("api called",data);
+  
+  const res = await axiosinstance.get(`/profile/getuserprofile/${data.username}`, {
     withCredentials: true,
   });
   console.log("Fetched from server:", res.data);
@@ -25,14 +24,14 @@ export const getuserprofileAPI = async ( username ) => {
 };
 
 export const getpostsAPI = async () => {
-  const res = await axios.get(`${BASE_URL}/profile/getposts`, {
+  const res = await axiosinstance.get(`/profile/getposts`, {
     withCredentials: true,
   });
   return res.data.posts;
 };
 
 export const addbookmarkAPI = async ({postId}) => {
-  const res = await axios.post(`${BASE_URL}/profile/addbookmark/${postId}`, null, {
+  const res = await axiosinstance.post(`/profile/addBookmark/${postId}`, null, {
     withCredentials: true,
   });
     console.log("from api",res.data)
@@ -40,14 +39,14 @@ export const addbookmarkAPI = async ({postId}) => {
 };
 
 export const removebookmarkAPI = async ({postId}) => {
-  const res = await axios.post(`${BASE_URL}/profile/removebookmark/${postId}`, null, {
+  const res = await axiosinstance.post(`/profile/removeBookmark/${postId}`, null, {
     withCredentials: true,
   });
   return res.data;
 };
 
 export const getbookmarkAPI = async () => {
-  const res = await axios.get(`${BASE_URL}/profile/getbookmarks`, {
+  const res = await axiosinstance.get(`/profile/getbookmarks`, {
     withCredentials: true,
   });
   return res.data.bookmarks;
@@ -55,7 +54,7 @@ export const getbookmarkAPI = async () => {
 export const searchuserAPI = async (input) => {
   try {
     console.log("In api call",input);
-    const res = await axios.get(`${BASE_URL}/profile/searchuser/${input}`, {
+    const res = await axiosinstance.get(`/profile/searchuser/${input}`, {
       
       withCredentials: true,
     });
@@ -67,7 +66,7 @@ export const searchuserAPI = async (input) => {
 };
 export const deleteuserAPI=async(id)=>{
   try{
-    const res = await axios.delete(`${BASE_URL}/profile/deleteaccount`,{
+    const res = await axiosinstance.delete(`/profile/deleteaccount`,{
             params:{id},
             withCredentials:true,
   });
@@ -81,7 +80,7 @@ export const deleteuserAPI=async(id)=>{
 export const getallusersAPI =async()=>{
   try{
         console.log('fetching....');
-    const res = await axios.get(`${BASE_URL}/profile/getallusers`,{
+    const res = await axiosinstance.get(`/profile/getallusers`,{
       withCredentials:true
       });
                 console.log('fetched....',res);

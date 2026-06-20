@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 
-export const handleShare = async (postId, caption = "") => {
-  const shareUrl = `${window.location.origin}/post/${postId}`;
+export const handleShare = async (postId, caption = "", customUrl = null) => {
+  const shareUrl = customUrl || `${window.location.origin}/post/${postId}`;
 
   if (navigator.share) {
     try {
@@ -10,7 +10,7 @@ export const handleShare = async (postId, caption = "") => {
         text: caption || "",
         url: shareUrl,
       });
-      toast.success("Post shared successfully!");
+      toast.success("Shared successfully!");
     } catch (err) {
       if (err.name === "AbortError") {
         console.log("Share cancelled by user");

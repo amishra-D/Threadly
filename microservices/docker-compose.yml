@@ -1,0 +1,78 @@
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
+      - user-service
+      - content-service
+      - interaction-service
+      - moderation-service
+    env_file:
+      - ./api-gateway/.env
+    volumes:
+      - ./api-gateway:/usr/src/app
+      - /usr/src/app/node_modules
+
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./auth-service/.env
+    volumes:
+      - ./auth-service:/usr/src/app
+      - /usr/src/app/node_modules
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./user-service/.env
+    volumes:
+      - ./user-service:/usr/src/app
+      - /usr/src/app/node_modules
+
+  content-service:
+    build: ./content-service
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./content-service/.env
+    volumes:
+      - ./content-service:/usr/src/app
+      - /usr/src/app/node_modules
+
+  interaction-service:
+    build: ./interaction-service
+    ports:
+      - "3004:3004"
+    env_file:
+      - ./interaction-service/.env
+    volumes:
+      - ./interaction-service:/usr/src/app
+      - /usr/src/app/node_modules
+
+  moderation-service:
+    build: ./moderation-service
+    ports:
+      - "3005:3005"
+    env_file:
+      - ./moderation-service/.env
+    volumes:
+      - ./moderation-service:/usr/src/app
+      - /usr/src/app/node_modules
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: threadly_rabbitmq
+    ports:
+      - "5672:5672"   
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_data:

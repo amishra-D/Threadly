@@ -27,6 +27,9 @@ const postsSlice = createSlice({
   initialState: {
     items: [],
     loading: false,
+    loadingMore: false,
+    hasMore: true,
+    page: 1,
     status: 'idle',
     error: null,
     reports:[],
@@ -35,18 +38,30 @@ const postsSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      .addCase(getAllPosts.pending, (state) => {
-        state.loading = true;
+      .addCase(getAllPosts.pending, (state, action) => {
+        if (action.meta.arg?.page > 1) {
+          state.loadingMore = true;
+        } else {
+          state.loading = true;
+        }
         state.status = 'loading';
         state.error = null;
       })
       .addCase(getAllPosts.fulfilled, (state, action) => {
         state.loading = false;
+        state.loadingMore = false;
         state.status = 'succeeded';
-        state.items = action.payload;
+        if (action.meta.arg?.page > 1) {
+          state.items = [...state.items, ...action.payload.posts];
+        } else {
+          state.items = action.payload.posts;
+        }
+        state.hasMore = action.payload.hasMore;
+        state.page = action.meta.arg?.page || 1;
       })
       .addCase(getAllPosts.rejected, (state, action) => {
         state.loading = false;
+        state.loadingMore = false;
         state.status = 'failed';
         state.error = action.error.message;
       })

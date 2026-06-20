@@ -1,42 +1,31 @@
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../Components/ui/tabs";
 import { getBookmarks, getUserProfile,getYourUser } from '../features/user/usersSlice';
 import { toast } from 'sonner';
-import PostCard from '../reusables/Postcard';
-import ProfileSkeleton from '../reusables/ProfileSkeleton';
+import PostCard from '../reusables/Posts/Postcard';
+import ProfileSkeleton from '../reusables/Posts/ProfileSkeleton';
 import { Button } from '../Components/ui/button';
-import { ChevronLeft, Pen } from 'lucide-react';
+import { ChevronLeft, Pen, Share } from 'lucide-react';
+import { handleShare } from '../features/handleShare';
 
 const Userprofile = () => {
   const navigate=useNavigate()
   const dispatch = useDispatch();
   const { myuser, user, posts, bookmarks, likedposts,Likesreceived,loading } = useSelector((state) => state.user);
   const location = useLocation();
+  const { username: paramUsername } = useParams();
   const { userData } = location.state || {};
 
-    useEffect(() => {
-      const fetch = async () => {
-        try {
-          const result = await dispatch(getYourUser()).unwrap();
-          console.log("Result from API:", result);
-        } catch (err) {
-          toast.error(err.message || "Cannot fetch posts");
-        }
-      };
-      fetch();
-    }, [dispatch]);
-    const isMe = userData?.username === myuser?.username || userData===undefined;
-    console.log("userdata",userData,isMe)
-  const username = isMe ? myuser?.username : userData?.username;
-
+  const targetUsername = paramUsername || userData?.username;
+  const isMe = !targetUsername || targetUsername === myuser?.username;
+  const username = isMe ? myuser?.username : targetUsername;
   useEffect(() => {
-
     if (username) {
       const fetchProfile = async () => {
         try {
-          const response = await dispatch(getUserProfile(username)).unwrap();
+          const response = await dispatch(getUserProfile({username})).unwrap();
           console.log("Fetched user from dispatch result:", response);
                     console.log("fetched user...",user)
           if (isMe) {
@@ -76,11 +65,24 @@ if(loading)
 
       <div className="w-full relative md:-mt-16 z-10">
        
-        <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-12 sm:-bottom-16 bg-black rounded-xl px-6 py-4 flex flex-col sm:flex-row items-center gap-6 shadow-xl border border-[#ddff0020] max-w-5xl w-full">
-        {isMe &&( <Button className="absolute right-2 -bottom-10 text-xs sm:right-10 sm:bottom-5 sm:top-auto flex items-center justify-centersm:text-sm w-fit bg-[#ddff00] hover:bg-[#b5c937]" onClick={()=>navigate('/updateprofile')}>
-  <span className="mr-2"><Pen /></span> 
-  Edit profile
-</Button>)}
+        <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-16 sm:-bottom-12 bg-black rounded-xl px-6 py-4 flex flex-col sm:flex-row items-center gap-6 shadow-xl border border-[#ddff0020] max-w-5xl w-full">
+        <div className="absolute right-2 -bottom-12 sm:right-10 sm:bottom-5 sm:top-auto flex items-center gap-2">
+          <Button 
+            variant="outline"
+            className="text-xs sm:text-sm h-8 bg-black hover:bg-gray-900 border-[#ddff00] text-[#ddff00]" 
+            onClick={() => handleShare(null, `Check out ${user?.username}'s profile on Threadly!`, `${window.location.origin}/userprofile/${user?.username}`)}
+          >
+            <Share className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Share</span>
+          </Button>
+
+          {isMe && (
+            <Button className="text-xs sm:text-sm h-8 bg-[#ddff00] hover:bg-[#b5c937] text-black" onClick={()=>navigate('/updateprofile')}>
+              <Pen className="w-4 h-4 sm:mr-2" /> 
+              <span className="hidden sm:inline">Edit</span>
+            </Button>
+          )}
+        </div>
 
            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-[#ddff00] p-1 bg-black shadow-md hover:scale-105 transition-transform">
             <img 

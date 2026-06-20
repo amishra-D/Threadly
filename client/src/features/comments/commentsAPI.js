@@ -1,11 +1,8 @@
-import axios from 'axios';
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+import { axiosinstance } from "@/utils/axios";
 
 export const addcommentAPI = async ({ postId, parentCommentId, content }) => {
-    console.log(parentCommentId);
-
-    const res = await axios.post(
-        `${BASE_URL}/comments/addcomment/${postId}`, 
+    const res = await axiosinstance.post(
+        `/comments/addcomment/${postId}`, 
         { content },                         
         {
             params: { parentCommentId },   
@@ -16,21 +13,20 @@ export const addcommentAPI = async ({ postId, parentCommentId, content }) => {
 };
 
 export const getcommentAPI=async(postId)=>{
-    const res=await axios.get(`${BASE_URL}/comments/getcomments/${postId}`,{
+    const res=await axiosinstance.get(`/comments/getcomments/${postId}`,{
         withCredentials: true
     });
-    console.log(res.data)
     return res.data;
 }
 export const deletecommentAPI=async(commentId)=>{
     console.log(commentId)
-    const res=await axios.delete(`${BASE_URL}/comments/deletecomment/${commentId}`,{
+    const res=await axiosinstance.delete(`/comments/deletecomment/${commentId}`,{
         withCredentials: true
     });
     return res.data;
 }
 export const addlikecommentAPI=async(commentId)=>{
-    const res=await axios.post(`${BASE_URL}/comments/likecomment/${commentId}`,null,{
+    const res=await axiosinstance.post(`/comments/addlike/${commentId}`,null,{
         withCredentials: true
     });
     console.log("mycommentid",commentId)
@@ -38,7 +34,7 @@ export const addlikecommentAPI=async(commentId)=>{
 }
 export const addislikecommentAPI=async(commentId)=>{
         console.log("in api",commentId)
-    const res=await axios.post(`${BASE_URL}/comments/dislikecomment/${commentId}`,null,{
+    const res=await axiosinstance.post(`/comments/adddislike/${commentId}`,null,{
         withCredentials: true
     });
     return res.data;

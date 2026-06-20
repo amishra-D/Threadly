@@ -1,0 +1,282 @@
+const Comments = require('../models/Comment');
+const axios = require('axios');
+const amqp = require('amqplib');
+
+const CONTENT_SERVICE_URL = process.env.CONTENT_SERVICE_URL || 'http://content-service:3003';
+const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://user-service:3002';
+
+let channel;
+const connectRabbitMQ = async () => {
+  try {
+    const rabbitUrl = process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672';
+    const connection = await amqp.connect(rabbitUrl);
+    channel = await connection.createChannel();
+
+    await channel.assertExchange('post_deleted_event', 'fanout', { durable: true });
+    const q1 = await channel.assertQueue('interaction_post_cleanup', { durable: true });
+    await channel.bindQueue(q1.queue, 'post_deleted_event', '');
+    channel.consume(q1.queue, async (msg) => {
+        if(msg !== null) {
+            const postId = JSON.parse(msg.content.toString()).postId;
+            try {
+                await Comments.deleteMany({ postId });
+                console.log(`[RabbitMQ] Deleted comments for post ${postId}`);
+            } catch(err) {
+                console.error("Error in deleting post comments", err);
+            }
+            channel.ack(msg);
+        }
+    });
+
+    await channel.assertExchange('user_delete_event', 'fanout', { durable: true });
+    const q2 = await channel.assertQueue('interaction_user_cleanup', { durable: true });
+    await channel.bindQueue(q2.queue, 'user_delete_event', '');
+    channel.consume(q2.queue, async (msg) => {
+        if(msg !== null) {
+            const authId = JSON.parse(msg.content.toString()).authId;
+            try {
+                await Comments.deleteMany({ userId: authId });
+                console.log(`[RabbitMQ] Deleted comments for user ${authId}`);
+            } catch(err) {
+                console.error("Error in deleting user comments", err);
+            }
+            channel.ack(msg);
+        }
+    });
+
+    console.log("RabbitMQ Connected in Interaction Service");
+  } catch (err) {
+    console.error("Failed to connect to RabbitMQ in Interaction Service, retrying...", err.message);
+    setTimeout(connectRabbitMQ, 5000);
+  }
+};
+connectRabbitMQ();
+
+const addcomment = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const {parentCommentId}=req.query;
+        const userId = req.user.id;
+        const { content } = req.body;
+
+        if (!content) {
+            return res.status(400).json({
+                success: false,
+                message: 'Content is required to add a comment.'
+            });
+        }
+
+        const actualParentCommentId = parentCommentId || null;
+
+        const comment = new Comments({
+            userId, postId, content, parentCommentId: actualParentCommentId
+        });
+
+        await comment.save();
+
+        // Increment comments count in Content Service
+        try {
+            await axios.post(`${CONTENT_SERVICE_URL}/internal/posts/${postId}/comments-count`, { increment: 1 });
+        } catch(err) {
+            console.error("Failed to increment comment count in Content Service", err.message);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Comment added successfully',
+            comment
+        });
+    } catch (error) {
+        console.error('Error in adding comment:', error);
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+const addlike = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { commentId } = req.params;
+
+        const comment = await Comments.findById(commentId);
+        if (!comment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Comment not found'
+            });
+        }
+
+        const hasLiked = comment.likes.includes(userId);
+        const hasDisliked = comment.dislikes?.includes(userId);
+        let update = {};
+
+        if (hasLiked) {
+            update.$pull = { likes: userId };
+        } else {
+            update.$addToSet = { likes: userId };
+            update.$pull = { ...(update.$pull || {}), dislikes: userId };
+        }
+
+        await Comments.findByIdAndUpdate(commentId, update, { new: true });
+
+        return res.status(200).json({
+            success: true,
+            message: hasLiked ? 'Like removed from comment' : 'Comment liked successfully',
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+const adddislike = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { commentId } = req.params;
+
+        const comment = await Comments.findById(commentId);
+        if (!comment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Comment not found'
+            });
+        }
+
+        const hasDisliked = comment.dislikes.includes(userId);
+        const hasLiked = comment.likes.includes(userId);
+
+        let update = {};
+
+        if (hasDisliked) {
+            update.$pull = { dislikes: userId };
+        } else {
+            update.$addToSet = { dislikes: userId };
+            update.$pull = { ...(update.$pull || {}), likes: userId };
+        }
+
+        await Comments.findByIdAndUpdate(commentId, update, { new: true });
+
+        return res.status(200).json({
+            success: true,
+            message: hasDisliked ? 'Dislike removed from comment' : 'Comment disliked successfully',
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+const deletecomment = async (req, res) => {
+    try {
+        const commentId = req.params.commentId;
+        const comment = await Comments.findById(commentId);
+
+        if (!comment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Comment not found'
+            });
+        }
+        const postId = comment.postId;
+        const replies = await Comments.find({ parentCommentId: commentId });
+
+        const totalCommentsToDelete = 1 + replies.length;
+
+        await Comments.deleteMany({ parentCommentId: commentId });
+        await Comments.findByIdAndDelete(commentId);
+
+        // Decrement comments count in Content Service
+        try {
+            await axios.post(`${CONTENT_SERVICE_URL}/internal/posts/${postId}/comments-count`, { increment: -totalCommentsToDelete });
+        } catch(err) {
+            console.error("Failed to decrement comment count in Content Service");
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Comment and its replies deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error in deleting comment:', error);
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+const internalDeletePostComments = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        await Comments.deleteMany({ postId });
+        res.status(200).send();
+    } catch(err) {
+        res.status(500).send();
+    }
+}
+
+const getcomments = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        
+        // Ensure post exists via Content Service
+        // Optional, but good practice. For now, assuming post exists if they are fetching comments.
+        
+        const comments = await Comments.find({ postId })
+            .populate("replies") // This works because replies are internal to Comments model
+            .sort({ createdAt: 1 })
+            .lean();
+
+        // Populate users manually
+        const userIds = new Set();
+        comments.forEach(c => {
+            userIds.add(c.userId);
+            if (c.replies) {
+                c.replies.forEach(r => userIds.add(r.userId));
+            }
+        });
+
+        const userMap = {};
+        await Promise.all([...userIds].map(async (id) => {
+            try {
+                const response = await axios.get(`${USER_SERVICE_URL}/internal/profile/${id}`);
+                if (response.data && response.data.profile) {
+                    userMap[id] = response.data.profile;
+                }
+            } catch(err) {
+                console.error(`Could not fetch profile for user ${id}`);
+            }
+        }));
+
+        const populatedComments = comments.map(c => ({
+            ...c,
+            userId: userMap[c.userId] ? { _id: c.userId, username: userMap[c.userId].username, pfp: userMap[c.userId].pfp } : c.userId,
+            replies: c.replies ? c.replies.map(r => ({
+                ...r,
+                userId: userMap[r.userId] ? { _id: r.userId, username: userMap[r.userId].username, pfp: userMap[r.userId].pfp } : r.userId
+            })) : []
+        }));
+
+        return res.status(200).json({
+            success: true,
+            message: 'All comments retrieved',
+            comments: populatedComments
+        });
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+module.exports = { addcomment, deletecomment, addlike, adddislike, getcomments, internalDeletePostComments };

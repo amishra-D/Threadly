@@ -1,5 +1,5 @@
-import Loginform from '../reusables/Loginform';
-import Signupform from '../reusables/Signupform';
+import Loginform from '../reusables/Auth/Loginform';
+import Signupform from '../reusables/Auth/Signupform';
 import React, { useState } from 'react';
 
 const Authentication = () => {

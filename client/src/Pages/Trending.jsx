@@ -1,12 +1,9 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllPosts } from '../features/posts/postsSlice';
-import PostCard from '../reusables/Postcard'; // adjust path as needed
+import PostCard from '../reusables/Posts/Postcard'; // adjust path as needed
 import { toast } from 'sonner';
 import { Skeleton } from '../Components/ui/skeleton';
-import Mysideb from '../reusables/Mysideb';
-import Header from '../reusables/Header';
-
 
 const Trending = () => {
   const dispatch = useDispatch();
@@ -26,16 +23,11 @@ const Trending = () => {
   const [featuredPost, ...otherPosts] = posts;
 
   return (
-    <div>
-                  <Header />
-    <div className='max-w-4xl mx-auto px-4 py-6 relative'>
-      <div className="hidden md:block absolute -left-72 top-0 md:w-1/4 z-30">
-                <Mysideb />
-              </div>
-      <section className='mb-10 mt-16'>
+    <div className='max-w-4xl mx-auto px-4 py-6 w-full'>
+      <section className='mb-10'>
         <h1 className='text-2xl md:text-3xl font-bold text-[#ddff00] mb-4'>Featured Post</h1>
         {loading ? (
-          <Skeleton height={400} className='rounded-xl' />
+          <Skeleton className='h-[400px] rounded-xl w-full' />
         ) : featuredPost ? (
           <div className='bg-gradient-to-r from-gray-900 to-gray-800 p-1 rounded-xl shadow-lg'>
             <PostCard 
@@ -50,6 +42,7 @@ const Trending = () => {
           </div>
         )}
       </section>
+
       <section>
         <div className='flex items-center justify-between mb-6'>
           <h1 className='text-2xl md:text-3xl font-bold text-[#ddff00]'>Trending Now</h1>
@@ -59,7 +52,7 @@ const Trending = () => {
         {loading ? (
           <div className='grid gap-6'>
             {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} height={120} className='rounded-lg' />
+              <Skeleton key={i} className='h-[120px] rounded-lg w-full' />
             ))}
           </div>
         ) : (
@@ -88,8 +81,6 @@ const Trending = () => {
         )}
       </section>
     </div>
-        </div>
-
   );
 };
 

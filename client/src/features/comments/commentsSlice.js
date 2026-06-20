@@ -18,13 +18,12 @@ const commentSlice = createSlice({
   initialState: {
     items: [],
     loading: false,
-    status: 'idle',
+     status: 'idle',
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-
       .addCase(getcomment.pending, (state) => {
         state.status = 'loading';
         state.loading = true;
@@ -39,7 +38,6 @@ const commentSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
       .addCase(addcomment.pending, (state) => {
         state.status = 'loading';
         state.loading = true;
@@ -48,13 +46,21 @@ const commentSlice = createSlice({
       .addCase(addcomment.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.loading = false;
-        state.items.push(action.payload);
+        const newComment = action.payload;
+        if (newComment.parentCommentId) {
+          const parent = state.items.find(c => c._id === newComment.parentCommentId);
+          if (parent) {
+            if (!parent.replies) parent.replies = [];
+            parent.replies.push(newComment);
+          }
+        } else {
+          state.items.push(newComment);
+        }
       })
       .addCase(addcomment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-
       .addCase(deletecomment.pending, (state) => {
         state.status = 'loading';
         state.loading = true;
@@ -63,23 +69,44 @@ const commentSlice = createSlice({
       .addCase(deletecomment.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.loading = false;
-        state.items = state.items.filter(comment => comment._id !== action.payload.commentId);
+        const commentId = action.payload.commentId;
+        state.items = state.items.filter(comment => comment._id !== commentId);
+        state.items.forEach(comment => {
+          if (comment.replies) {
+            comment.replies = comment.replies.filter(reply => reply._id !== commentId);
+          }
+        });
       })
       .addCase(deletecomment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-
       .addCase(addlike.fulfilled, (state, action) => {
         const updatedComment = action.payload;
-        const index = state.items.findIndex(c => c._id === updatedComment._id);
-        if (index !== -1) state.items[index] = updatedComment;
+        if (updatedComment.parentCommentId) {
+          const parent = state.items.find(c => c._id === updatedComment.parentCommentId);
+          if (parent && parent.replies) {
+            const index = parent.replies.findIndex(c => c._id === updatedComment._id);
+            if (index !== -1) parent.replies[index] = updatedComment;
+          }
+        } else {
+          const index = state.items.findIndex(c => c._id === updatedComment._id);
+          if (index !== -1) state.items[index] = updatedComment;
+        }
       })
 
       .addCase(adddislike.fulfilled, (state, action) => {
         const updatedComment = action.payload;
-        const index = state.items.findIndex(c => c._id === updatedComment._id);
-        if (index !== -1) state.items[index] = updatedComment;
+        if (updatedComment.parentCommentId) {
+          const parent = state.items.find(c => c._id === updatedComment.parentCommentId);
+          if (parent && parent.replies) {
+            const index = parent.replies.findIndex(c => c._id === updatedComment._id);
+            if (index !== -1) parent.replies[index] = updatedComment;
+          }
+        } else {
+          const index = state.items.findIndex(c => c._id === updatedComment._id);
+          if (index !== -1) state.items[index] = updatedComment;
+        }
       });
   }
 });

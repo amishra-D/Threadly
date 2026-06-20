@@ -64,4 +64,4 @@ services:
     volumes:
       - ./moderation-service:/usr/src/app
       - /usr/src/app/node_modules
-
+

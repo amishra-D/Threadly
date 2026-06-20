@@ -6,7 +6,8 @@ const boardroutes = require('./routes/boardroutes');
 const fileUpload = require("express-fileupload");
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
-
+const { connectRabbitMQ } = require('./config/rabbitmq');
+const { setupConsumers } = require('./rabbitmq/consumer');
 dotenv.config();
 const PORT = process.env.PORT || 3003;
 
@@ -19,6 +20,9 @@ app.use(fileUpload({
 
 dbConnect();
 
+connectRabbitMQ().then(() => {
+    setupConsumers();
+});
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

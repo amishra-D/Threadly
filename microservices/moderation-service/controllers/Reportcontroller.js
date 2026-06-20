@@ -1,58 +1,6 @@
 const Report = require('../models/Report');
 const axios = require('axios');
-const amqp = require('amqplib');
-
-const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://localhost:3002';
-const CONTENT_SERVICE_URL = process.env.CONTENT_SERVICE_URL || 'http://localhost:3003';
-
-let channel;
-const connectRabbitMQ = async () => {
-  try {
-    const rabbitUrl = process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672';
-    const connection = await amqp.connect(rabbitUrl);
-    channel = await connection.createChannel();
-    
-    await channel.assertExchange('post_deleted_event', 'fanout', { durable: true });
-    const q1 = await channel.assertQueue('moderation_post_cleanup', { durable: true });
-    await channel.bindQueue(q1.queue, 'post_deleted_event', '');
-    channel.consume(q1.queue, async (msg) => {
-        if(msg !== null) {
-            const postId = JSON.parse(msg.content.toString()).postId;
-            try {
-                await Report.deleteMany({ contentId: postId });
-                console.log(`[RabbitMQ] Deleted reports for post ${postId}`);
-            } catch(err) {
-                console.error("Error in deleting post reports", err);
-            }
-            channel.ack(msg);
-        }
-    });
-
-    await channel.assertExchange('user_delete_event', 'fanout', { durable: true });
-    const q2 = await channel.assertQueue('moderation_user_cleanup', { durable: true });
-    await channel.bindQueue(q2.queue, 'user_delete_event', '');
-    channel.consume(q2.queue, async (msg) => {
-        if(msg !== null) {
-            const authId = JSON.parse(msg.content.toString()).authId;
-            try {
-                await Report.deleteMany({ reportedBy: authId });
-                console.log(`[RabbitMQ] Deleted reports for user ${authId}`);
-            } catch(err) {
-                console.error("Error in deleting user reports", err);
-            }
-            channel.ack(msg);
-        }
-    });
-
-    await channel.assertQueue('post_reports_count', { durable: true });
-
-    console.log("RabbitMQ Connected in Moderation Service");
-  } catch (err) {
-    console.error("Failed to connect to RabbitMQ in Moderation Service, retrying...", err.message);
-    setTimeout(connectRabbitMQ, 5000);
-  }
-};
-connectRabbitMQ();
+const { publishToQueue } = require('../rabbitmq/producer');
 
 const addreport = async (req, res) => {
   try {
@@ -69,10 +17,10 @@ const addreport = async (req, res) => {
 
     try {
         if(type === 'Post') {
-            channel.sendToQueue('post_reports_count', Buffer.from(JSON.stringify({
+            await publishToQueue('post_reports_count', {
                 postId: contentId,
                 increment: 1
-            })));
+            });
         }
     } catch(err) {
         console.error("Failed to enqueue reports count update", err.message);

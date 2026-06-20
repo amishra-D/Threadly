@@ -5,39 +5,7 @@ const Auth = require('../models/Auth');
 const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
 const axios = require('axios');
-const amqp = require('amqplib');
-let channel;
-const connectRabbitMQ = async () => {
-  try {
-    const rabbitUrl = process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672';
-    const connection = await amqp.connect(rabbitUrl);
-    channel = await connection.createChannel();
-    await channel.assertQueue('user_created');
-    
-    await channel.assertExchange('user_delete_event', 'fanout', { durable: true });
-    const q = await channel.assertQueue('auth_cleanup', { durable: true });
-    await channel.bindQueue(q.queue, 'user_delete_event', '');
-    
-    channel.consume(q.queue, async (msg) => {
-        if(msg !== null) {
-            const id = JSON.parse(msg.content.toString()).authId;
-            try {
-                await Auth.findByIdAndDelete(id);
-                console.log(`[RabbitMQ] Deleted Auth record for ${id}`);
-            } catch(err) {
-                console.error("Error in deleting auth", err);
-            }
-            channel.ack(msg);
-        }
-    });
-
-    console.log("RabbitMQ Connected in Auth Service");
-  } catch (err) {
-    console.error("Failed to connect to RabbitMQ in Auth Service, retrying...", err.message);
-    setTimeout(connectRabbitMQ, 5000);
-  }
-};
-connectRabbitMQ();
+const { publishToQueue } = require('../rabbitmq/producer');
 
 dotenv.config();
 
@@ -132,7 +100,7 @@ const verifyOtp = async (req, res) => {
         username: authRecord.username,
         email: authRecord.email
       }
-      channel.sendToQueue('user_created', Buffer.from(JSON.stringify(profileData)));
+      await publishToQueue('user_created', profileData);
       console.log("User profile created successfully");
     } catch (profileError) {
         console.error("Failed to create profile in User Service", profileError.message);

@@ -64,15 +64,4 @@ services:
     volumes:
       - ./moderation-service:/usr/src/app
       - /usr/src/app/node_modules
-
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: threadly_rabbitmq
-    ports:
-      - "5672:5672"   
-      - "15672:15672"
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-
-volumes:
-  rabbitmq_data:
+

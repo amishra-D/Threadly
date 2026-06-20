@@ -1,46 +1,8 @@
 const Profile = require('../models/Profile');
 const cloudinary = require('cloudinary').v2;
-const amqp = require('amqplib');
 require('dotenv').config();
 const axios = require('axios');
-
-async function initProfileConsumer() {
-    try {
-        const rabbitUrl = process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672';
-        const connection = await amqp.connect(rabbitUrl);
-        const channel = await connection.createChannel();
-        
-        await channel.assertQueue('user_created');
-        console.log("RabbitMQ Connected: Profile controller waiting for messages...");
-        
-        channel.consume('user_created', async (msg) => {
-            if (msg !== null) {
-                try {
-                    const data = JSON.parse(msg.content.toString());
-                    
-                    const existingProfile = await Profile.findOne({ authId: data.authId });
-                    if (!existingProfile) {
-                        const newProfile = new Profile({
-                            authId: data.authId,
-                            username: data.username,
-                            email: data.email
-                        });
-                        await newProfile.save();
-                        console.log(`[RabbitMQ] Profile successfully created for ${data.username}`);
-                    }
-                    channel.ack(msg);
-                } catch (err) {
-                    console.error("Error processing user_created message:", err.message);
-                    channel.nack(msg, false, false);
-                }
-            }
-        });
-    } catch (err) {
-        console.error("Failed to connect to RabbitMQ in Profile controller, retrying...", err.message);
-        setTimeout(initProfileConsumer, 5000);
-    }
-}
-
+const { publishToExchange } = require('../rabbitmq/producer');
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dgvmc3ezr',
   api_key: process.env.CLOUDINARY_API,
@@ -205,17 +167,8 @@ const deleteuser = async (req, res) => {
     try {
         await Profile.findOneAndDelete({ authId: req.user.id });
         
-        const rabbiturl = process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672';
-        const connection = await amqp.connect(rabbiturl);
-        const channel = await connection.createChannel();
-        await channel.assertExchange('user_delete_event', 'fanout', { durable: true });
-        
         // Consistent key: authId
-        const msg = JSON.stringify({ authId: req.user.id });
-        channel.publish('user_delete_event', '', Buffer.from(msg));
-        
-        await channel.close();
-        await connection.close();
+        await publishToExchange('user_delete_event', '', { authId: req.user.id });
         
         res.status(200).json({ message: "Profile deleted and broadcasted" });
     } catch (error) {
@@ -227,5 +180,5 @@ module.exports = {
     getInternalProfile,
     getyourprofile, getUserProfile, searchuser, updateUser,
     addBookmark, removeBookmark, getposts, getUserBookmarks,
-    getallusers, deleteuser, initProfileConsumer
+    getallusers, deleteuser
 };

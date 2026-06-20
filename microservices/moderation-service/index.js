@@ -4,7 +4,8 @@ const dbConnect = require('./config/database');
 const reportroutes = require('./routes/reportroutes');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
-
+const { connectRabbitMQ } = require('./config/rabbitmq');
+const { setupConsumers } = require('./rabbitmq/consumer');
 dotenv.config();
 const PORT = process.env.PORT || 3005;
 
@@ -15,6 +16,10 @@ dbConnect();
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+connectRabbitMQ().then(() => {
+    setupConsumers();
+});
 const allowedOrigins = [
   process.env.FRONT_URL || "http://localhost:5173",
   "http://localhost:3000"

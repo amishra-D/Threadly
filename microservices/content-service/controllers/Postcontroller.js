@@ -2,66 +2,7 @@ const Posts = require('../models/Post');
 const cloudinary = require('../config/cloudinary');
 const axios = require('axios');
 const redis = require('../config/redis');
-const amqp = require('amqplib');
-let channel;
-const connectRabbitMQ = async () => {
-  try {
-    const rabbitUrl = process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672';
-    const connection = await amqp.connect(rabbitUrl);
-    channel = await connection.createChannel();
-    
-    await channel.assertExchange('user_delete_event', 'fanout', { durable: true });
-    const q = await channel.assertQueue('content_cleanup', { durable: true });
-    await channel.bindQueue(q.queue, 'user_delete_event', '');
-    
-    channel.consume(q.queue, async (msg) => {
-        if(msg !== null) {
-            const id = JSON.parse(msg.content.toString()).authId;
-            try {
-                await Posts.deleteMany({ userId: id });
-                console.log(`[RabbitMQ] Deleted posts for user ${id}`);
-            } catch(err) {
-                console.error("Error in deleting posts", err);
-            }
-            channel.ack(msg);
-        }
-    });
-
-    await channel.assertQueue('post_comments_count', { durable: true });
-    channel.consume('post_comments_count', async (msg) => {
-        if(msg !== null) {
-            const { postId, increment } = JSON.parse(msg.content.toString());
-            try {
-                await Posts.findByIdAndUpdate(postId, { $inc: { commentsCount: increment } });
-                console.log(`[RabbitMQ] Updated commentsCount by ${increment} for post ${postId}`);
-            } catch(err) {
-                console.error("Error updating commentsCount", err);
-            }
-            channel.ack(msg);
-        }
-    });
-
-    await channel.assertQueue('post_reports_count', { durable: true });
-    channel.consume('post_reports_count', async (msg) => {
-        if(msg !== null) {
-            const { postId, increment } = JSON.parse(msg.content.toString());
-            try {
-                await Posts.findByIdAndUpdate(postId, { $inc: { reportsCount: increment } });
-                console.log(`[RabbitMQ] Updated reportsCount by ${increment} for post ${postId}`);
-            } catch(err) {
-                console.error("Error updating reportsCount", err);
-            }
-            channel.ack(msg);
-        }
-    });
-
-    console.log("RabbitMQ Connected in Content Service");
-  } catch (err) {
-    console.error("Failed to connect to RabbitMQ in Content Service, retrying...", err.message);
-    setTimeout(connectRabbitMQ, 5000);
-  }
-};
-connectRabbitMQ();
+const { publishToExchange } = require('../rabbitmq/producer');
 
 const createtextpost = async (req, res) => {
     try {
@@ -312,14 +253,8 @@ const deletepost = async (req, res) => {
         await Posts.findByIdAndDelete(id);
         
         try {
-            if (channel) {
-                await channel.assertExchange('post_deleted_event', 'fanout', { durable: true });
-                const msg = JSON.stringify({ postId: id });
-                channel.publish('post_deleted_event', '', Buffer.from(msg));
-                console.log(`[RabbitMQ] Broadcasted post_deleted_event for post ${id}`);
-            } else {
-                console.error("RabbitMQ channel not available to broadcast post deletion");
-            }
+            await publishToExchange('post_deleted_event', '', { postId: id });
+            console.log(`[RabbitMQ] Broadcasted post_deleted_event for post ${id}`);
         } catch(err) {
             console.error("Failed to broadcast post deletion via RabbitMQ", err);
         }

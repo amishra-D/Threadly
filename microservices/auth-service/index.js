@@ -3,7 +3,8 @@ const cors = require("cors");
 const dbConnect = require('./config/database');
 const authroutes = require('./routes/authroutes');
 const dotenv = require('dotenv');
-
+const { connectRabbitMQ } = require('./config/rabbitmq');
+const { setupConsumers } = require('./rabbitmq/consumer');
 dotenv.config();
 const PORT = process.env.PORT || 3001;
 
@@ -12,6 +13,10 @@ const app = express();
 dbConnect();
 
 app.use(express.json());
+
+connectRabbitMQ().then(() => {
+    setupConsumers();
+});
 app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [

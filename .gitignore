@@ -31,3 +31,4 @@ docker-compose.override.yml
 *.njsproj
 *.sln
 *.sw?
+threadly-key.pem

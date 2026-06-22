@@ -35,11 +35,14 @@ const apiLimiter = rateLimit({
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || 
+        allowedOrigins.includes(origin) || 
+        origin.endsWith('.vercel.app') || 
+        origin.includes('vercel.app')) {
       callback(null, true);
     } else {
       console.log("CORS blocked:", origin);
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false);
     }
   },
   credentials: true,

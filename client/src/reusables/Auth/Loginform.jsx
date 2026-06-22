@@ -34,8 +34,7 @@ const Loginform = () => {
     try {
       const result = await dispatch(loginUser(data)).unwrap();
       toast.success(result.message || "Login successful!");
-      // New users have no bio — send them to profile setup
-      const isNewUser = !result.user?.bio;
+      const isNewUser = result.user?.authId && !result.user?.bio;
       navigate(isNewUser ? '/setup-profile' : '/home');
     } catch (err) {
       toast.error(err.message || "Login failed. Please try again.");
@@ -46,7 +45,7 @@ const Loginform = () => {
     try {
       const result = await dispatch(googleLogin(credentialResponse.credential)).unwrap();
       toast.success(result.message || "Google login successful!");
-      const isNewUser = !result.user?.bio;
+      const isNewUser = result.user?.authId && !result.user?.bio;
       navigate(isNewUser ? '/setup-profile' : '/home');
     } catch (err) {
       toast.error(err || "Google login failed. Please try again.");

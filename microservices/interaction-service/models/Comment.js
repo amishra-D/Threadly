@@ -1,7 +1,7 @@
 const mongoose=require('mongoose')
 const commentSchema = new mongoose.Schema({
   postId: { type: String, required: true },
-  userId: { type: String, required: true },
+  userId: { type: String, default: null }, // null = anonymised (user deleted)
   parentCommentId: { type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: null },
   content: { type: String, required: true },
   likes: [{ type: String }],

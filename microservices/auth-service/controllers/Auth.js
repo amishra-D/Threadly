@@ -1,4 +1,6 @@
 const dotenv = require('dotenv');
+dotenv.config(); // Must be first before any process.env reads
+
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Auth = require('../models/Auth');
@@ -6,8 +8,9 @@ const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
 const axios = require('axios');
 const { publishToQueue } = require('../rabbitmq/producer');
+const { OAuth2Client } = require('google-auth-library');
 
-dotenv.config();
+const client = new OAuth2Client(process.env.OAUTH_CLIENT_ID);
 
 const signup = async (req, res) => {
   try {
@@ -74,6 +77,7 @@ const signup = async (req, res) => {
 
   } catch (err) {
     console.error(err);
+    res.status(500).json({ message: 'Something went wrong during signup.' });
   }
 }
 
@@ -187,14 +191,144 @@ const resetpassword = async (req, res) => {
     })
   }
 }
+const signupandloginwithgoogle = async (req, res) => {
+  try {
+    const { tokenId } = req.body;
+
+    const ticket = await client.verifyIdToken({
+      idToken: tokenId,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+
+    const {
+      email,
+      name,
+      sub: googleId,
+      email_verified
+    } = payload;
+
+    let authRecord = await Auth.findOne({ email });
+    if (authRecord) {
+
+      if (!authRecord.googleId) {
+        authRecord.googleId = googleId;
+        authRecord.provider = "google";
+        authRecord.isVerified = true;
+        await authRecord.save();
+      }
+
+    } else {
+
+      authRecord = await Auth.create({
+        username: name,
+        email,
+        provider: "google",
+        googleId,
+        isVerified: email_verified
+      });
+
+      try {
+        const profileData = {
+          authId: authRecord._id,
+          username: authRecord.username,
+          email: authRecord.email
+        };
+
+        await publishToQueue(
+          "user_created",
+          profileData
+        );
+
+      } catch (profileError) {
+        console.error(
+          "Failed to create profile",
+          profileError.message
+        );
+      }
+    }
+
+    const token = jwt.sign(
+      {
+        id: authRecord._id,
+        isAdmin: authRecord.isAdmin
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d"
+      }
+    );
+
+    const isProduction =
+      process.env.NODE_ENV === "production";
+
+    let userProfile = {
+      username: authRecord.username,
+      _id: authRecord._id
+    };
+
+    try {
+      const response = await axios.get(
+        `${process.env.USER_SERVICE_URL}/internal/profile/${authRecord._id}`
+      );
+
+      if (
+        response.data &&
+        response.data.profile
+      ) {
+        userProfile = response.data.profile;
+      }
+
+    } catch (profileErr) {
+      console.error(
+        "Could not fetch profile",
+        profileErr.message
+      );
+    }
+
+    return res
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction
+          ? "None"
+          : "Lax",
+        maxAge:
+          7 * 24 * 60 * 60 * 1000
+      })
+      .status(200)
+      .json({
+        success: true,
+        user: {
+          ...userProfile,
+          email: authRecord.email,
+          isAdmin: authRecord.isAdmin
+        },
+        message: "Google login successful"
+      });
+
+  } catch (error) {
+    console.error(
+      "Google auth error:",
+      error
+    );
+
+    return res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 
 const logout = async (req, res) => {
+  const isProduction = process.env.NODE_ENV === 'production';
   res.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    secure: isProduction,
+    sameSite: isProduction ? 'None' : 'Lax',
   });
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
-module.exports = { signup, login, resetpassword, verifyOtp, logout };
+module.exports = { signup, login, resetpassword, verifyOtp,signupandloginwithgoogle, logout };

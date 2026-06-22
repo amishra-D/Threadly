@@ -22,7 +22,7 @@ function Otp() {
       .unwrap()
       .then((res) => {
         console.log("Verification successful", res);
-        navigate("/auth");
+        navigate('/auth', { state: { verified: true, email } });
       })
       .catch((err) => {
         alert(err);

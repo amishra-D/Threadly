@@ -47,7 +47,7 @@ export const resetpassword = createAsyncThunk(
   'auth/resetpassword',
   async (formData, thunkAPI) => {
     try {
-      const res = await axios.post(`${BASE_URL}/auth/resetpassword`, formData, {
+      const res = await axios.put(`${BASE_URL}/auth/resetpassword`, formData, {
         withCredentials: true
       });
       return res.data;
@@ -66,6 +66,24 @@ export const logoutUser = createAsyncThunk(
       return true;
     } catch (err) {
       return thunkAPI.rejectWithValue('Logout failed');
+    }
+  }
+);
+
+export const googleLogin = createAsyncThunk(
+  'auth/googleLogin',
+  async (credential, thunkAPI) => {
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/auth/signupandloginwithgoogle`,
+        { tokenId: credential },
+        { withCredentials: true }
+      );
+      return res.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || 'Google login failed'
+      );
     }
   }
 );
@@ -139,10 +157,23 @@ const authSlice = createSlice({
       })
       .addCase(verifyotp.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.isAuthenticated = true;
+        // OTP verification does not issue a JWT — user must still log in
+        // Do NOT set isAuthenticated here
       })
       .addCase(verifyotp.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(googleLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(googleLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload.user;
+      })
+      .addCase(googleLogin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

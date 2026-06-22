@@ -26,10 +26,10 @@ const addcomment = async (req, res) => {
 
         // Increment comments count in Content Service via RabbitMQ
         try {
-            channel.sendToQueue('post_comments_count', Buffer.from(JSON.stringify({
+            publishToQueue('post_comments_count', {
                 postId,
                 increment: 1
-            })));
+            });
         } catch(err) {
             console.error("Failed to enqueue comment count increment", err.message);
         }
@@ -149,10 +149,10 @@ const deletecomment = async (req, res) => {
 
         // Decrement comments count in Content Service via RabbitMQ
         try {
-            channel.sendToQueue('post_comments_count', Buffer.from(JSON.stringify({
+            publishToQueue('post_comments_count', {
                 postId,
                 increment: -totalCommentsToDelete
-            })));
+            });
         } catch(err) {
             console.error("Failed to enqueue comment count decrement", err.message);
         }
@@ -202,9 +202,11 @@ const getcomments = async (req, res) => {
         });
 
         const userMap = {};
-        await Promise.all([...userIds].map(async (id) => {
+        const DELETED_USER = { _id: null, username: '[deleted]', pfp: null };
+
+        await Promise.all([...userIds].filter(Boolean).map(async (id) => {
             try {
-                const response = await axios.get(`${USER_SERVICE_URL}/internal/profile/${id}`);
+                const response = await axios.get(`${process.env.USER_SERVICE_URL}/internal/profile/${id}`);
                 if (response.data && response.data.profile) {
                     userMap[id] = response.data.profile;
                 }
@@ -215,10 +217,18 @@ const getcomments = async (req, res) => {
 
         const populatedComments = comments.map(c => ({
             ...c,
-            userId: userMap[c.userId] ? { _id: c.userId, username: userMap[c.userId].username, pfp: userMap[c.userId].pfp } : c.userId,
+            userId: !c.userId
+                ? DELETED_USER
+                : userMap[c.userId]
+                    ? { _id: c.userId, username: userMap[c.userId].username, pfp: userMap[c.userId].pfp }
+                    : c.userId,
             replies: c.replies ? c.replies.map(r => ({
                 ...r,
-                userId: userMap[r.userId] ? { _id: r.userId, username: userMap[r.userId].username, pfp: userMap[r.userId].pfp } : r.userId
+                userId: !r.userId
+                    ? DELETED_USER
+                    : userMap[r.userId]
+                        ? { _id: r.userId, username: userMap[r.userId].username, pfp: userMap[r.userId].pfp }
+                        : r.userId
             })) : []
         }));
 

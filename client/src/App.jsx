@@ -15,6 +15,7 @@ import Unauthorized from "./Pages/Unauthorized";
 import AdminRoute from "./reusables/Admin/AdminRoute";
 import About from './Pages/About';
 import Otp from './Pages/Otp';
+import SetupProfile from './Pages/SetupProfile';
 import { getYourUser } from './features/user/usersSlice';
 import {useDispatch} from 'react-redux';
 import AppLayout from './reusables/AppLayout';
@@ -34,6 +35,7 @@ const App = () => {
  <Routes>
       <Route path="/auth" element={<Authentication />} />
       <Route path="/otp" element={<Otp />} />
+      <Route path="/setup-profile" element={<SetupProfile />} />
       <Route path="/" element={<Landing />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/about" element={<About/>} />

@@ -78,8 +78,33 @@ const searchuser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const { bio, location } = req.body;
-        let updateData = { bio, location };
+        const { bio, location, username, url, banner } = req.body;
+
+        // Build update object with all provided fields
+        let updateData = {};
+        if (bio !== undefined)      updateData.bio = bio;
+        if (location !== undefined) updateData.location = location;
+
+        // Username update — check uniqueness first
+        if (username) {
+            const existing = await Profile.findOne({ username, authId: { $ne: req.user.id } });
+            if (existing) {
+                return res.status(400).json({ message: 'Username already taken.' });
+            }
+            updateData.username = username;
+        }
+
+        // Avatar: url field from client (DiceBear URL or any image URL) → saved as pfp
+        if (url) {
+            updateData.pfp = url;
+        }
+
+        // Banner: URL string from client picker
+        if (banner) {
+            updateData.banner = banner;
+        }
+
+        // File uploads still supported (overrides URL if both provided)
         if (req.files) {
             if (req.files.pfp) {
                 const result = await cloudinary.uploader.upload(req.files.pfp.tempFilePath, { folder: "threadly_pfps" });
@@ -97,11 +122,16 @@ const updateUser = async (req, res) => {
             { new: true }
         );
 
-        res.status(200).json({ success: true, user: updatedProfile });
+        if (!updatedProfile) {
+            return res.status(404).json({ message: 'Profile not found.' });
+        }
+
+        res.status(200).json({ success: true, user: updatedProfile, message: 'Profile updated successfully!' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 const addBookmark = async (req, res) => {
     try {

@@ -10,11 +10,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const services = {
-    auth: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
-    user: process.env.USER_SERVICE_URL || 'http://localhost:3002',
-    content: process.env.CONTENT_SERVICE_URL || 'http://localhost:3003',
-    interaction: process.env.INTERACTION_SERVICE_URL || 'http://localhost:3004',
-    moderation: process.env.MODERATION_SERVICE_URL || 'http://localhost:3005',
+  auth: process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
+  user: process.env.USER_SERVICE_URL || 'http://localhost:3002',
+  content: process.env.CONTENT_SERVICE_URL || 'http://localhost:3003',
+  interaction: process.env.INTERACTION_SERVICE_URL || 'http://localhost:3004',
+  moderation: process.env.MODERATION_SERVICE_URL || 'http://localhost:3005',
 };
 
 const allowedOrigins = [
@@ -23,8 +23,8 @@ const allowedOrigins = [
 ];
 
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 100, 
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -47,7 +47,16 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Apply the rate limiting middleware to all requests
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: 'healthy',
+    service: 'api-gateway',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 app.use(apiLimiter);
 
 app.use('/api/v1/auth', createProxyMiddleware({ target: services.auth, changeOrigin: true }));
@@ -63,9 +72,9 @@ app.use('/api/v1/like-dislike', createProxyMiddleware({ target: services.interac
 app.use('/api/v1/report', createProxyMiddleware({ target: services.moderation, changeOrigin: true }));
 
 app.get('/', (req, res) => {
-    res.send("Threadly API Gateway is running");
+  res.send("Threadly API Gateway is running");
 });
 
 app.listen(PORT, () => {
-    console.log(`API Gateway is running on port ${PORT}`);
+  console.log(`API Gateway is running on port ${PORT}`);
 });

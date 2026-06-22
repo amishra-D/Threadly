@@ -57,7 +57,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.use(apiLimiter);
+// app.use(apiLimiter);
 
 app.use('/api/v1/auth', createProxyMiddleware({ target: services.auth, changeOrigin: true }));
 

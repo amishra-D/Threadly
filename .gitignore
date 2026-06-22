@@ -32,3 +32,4 @@ docker-compose.override.yml
 *.sln
 *.sw?
 threadly-key.pem
+loadtesting.js
